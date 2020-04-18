@@ -97,7 +97,9 @@
 
          function Send( cMsg ) {
 			if( socket != null )
-               socket.send( cMsg );
+			   socket.send( cMsg );
+			else   
+   			   alert( 'Please run wsserver.exe first on your computer' );
 		 }
 		 
          function OnOff(){
@@ -134,7 +136,7 @@
 			};
 
 			socket.onerror = function(error) {
-				alert( 'Please run wsserver.exe on your computer and then refresh this page' ); // `[error] ${error.message}`);
+				alert( 'Please run wsserver.exe first on your computer' ); // `[error] ${error.message}`);
 				document.getElementById( 'msg' ).innerHTML = 'Disconnect';
 			};			
 		 }
