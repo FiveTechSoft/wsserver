@@ -113,7 +113,7 @@ return cText
 
 function Mask( cText )
 
-   local nLen := Len( hb_strToUTF8( cText ) ) 
+   local nLen := Len(  cText ) 
    local cHeader   
 
    do case
@@ -126,7 +126,7 @@ function Mask( cText )
          // cHeader = Pack( 'CCNN', 129, 127, nLen )    
    endcase
 
-return cHeader + hb_strToUTF8( cText )   
+return cHeader + cText   
 
 //----------------------------------------------------------------//
 
