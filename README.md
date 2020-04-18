@@ -1,5 +1,4 @@
-# wsserver
-Harbour websocket server
+# Harbour websocket server
 
 Here you have a first prototype of a Harbour websocket server:
 
