@@ -10,8 +10,7 @@
 
 function Main()
 
-   local hListen
-   local hSocket
+   local hListen, hSocket
 
    if ! hb_mtvm()
       ? "multithread support required"
