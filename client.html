@@ -2,9 +2,9 @@
    <head>
    </head>
    <body>
-   <input type="text" id="msg">
-   <button onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
-   <script>
+      <input type="text" id="msg">
+      <button onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+      <script>
       var socket = new WebSocket( "ws://localhost:9000" );
 
       socket.onopen = function(e) {
