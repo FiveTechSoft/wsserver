@@ -111,22 +111,38 @@ return cText
 
 //----------------------------------------------------------------//
 
+function NetworkW2Bin ( nNumber )
+return Chr( hb_BitShift( nNumber, -8 ) ) + Chr( hb_BitAnd( nNumber, 0xFF ) )
+
+function NetworkULL2Bin ( nNumber )
+
+   local num := nNumber, bytesLeft := 64
+   local bytes := ""
+
+   while bytesLeft > 0
+      bytesLeft -= 8
+      bytes += Chr( hb_BitShift( hb_BitShift( num, -bytesLeft ), 0xFF ) )
+   end
+
+return bytes
+
 function Mask( cText )
 
    local nLen := Len(  cText ) 
-   local cHeader   
+   local cHeder, cChar
 
    do case
       case nLen <= 125
          cHeader = Chr( 129 ) + Chr( nLen )   
 
-      case nLen > 123 .and. nLen < 65536
+      case nLen < 65536
+         cHeader = Chr( 129 ) + Chr( 126 ) + NetworkW2Bin( nLen )
          
       otherwise 
-         // cHeader = Pack( 'CCNN', 129, 127, nLen )    
+         cHeader = Chr( 129 ) + Chr( 127 ) + NetworkULL2Bin( nLen )
    endcase
 
-return cHeader + cText   
+return cHeader + cText
 
 //----------------------------------------------------------------//
 
