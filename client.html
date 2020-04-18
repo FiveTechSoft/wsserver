@@ -22,12 +22,17 @@
 			letter-spacing: -1px;color: #444;			
 		}
 
-
 		#mylogo {
 			width: 130px;
 			margin-left: 10px;
 			margin-right: 10px;
 			vertical-align: middle;
+		}
+		
+		#harbour {
+			height: 180px;
+			margin-bottom: 50px;
+			margin-top: 60px;		
 		}
 		
 		#content {
@@ -43,9 +48,10 @@
 		  border: 1px solid #ccc;
 		  border-radius: 4px;
 		  box-sizing: border-box;
+		  font-size: 20px;
 		}
 
-		#btn {
+		.btn {
 		  width: 15%;
 		  background-color: #4CAF50;
 		  color: white;
@@ -54,6 +60,11 @@
 		  border: none;
 		  border-radius: 4px;
 		  cursor: pointer;
+		  margin-top: 30px;
+		  margin-bottom: 20px;
+		  margin-right: 10px;
+		  margin-left: 10px;
+		  font-size: 20px;
 		}
 
 		#btn:hover {
@@ -64,14 +75,17 @@
    
    <body>
 		<div class="myhead">
-			<img id="mylogo" src="harbour.png">
-			<span>Harbour websocket server - client demo</span>
+			<!--<img id="mylogo" src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true">-->
+			<span>Harbour websocket server - client demo</span>			
 			<hr>
 		</div>
 		
 		<div id="content">
-			<input type="text" id="msg">
-			<button id="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+			<img id="harbour" src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"><br>
+			<input type="text" id="msg"><br>
+			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value )">Connect</button>
+			<br><a href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a>
 		</div>
 		
       <script>
