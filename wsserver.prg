@@ -41,7 +41,7 @@ function Main()
          endif
       ELSE
          ? "accept socket request"
-         hb_threadDetach( hb_threadStart( @process(), hSocket ) )
+         hb_threadDetach( hb_threadStart( @ServeClient(), hSocket ) )
       endif
       if Inkey() == K_ESC
          ? "quitting - esc pressed"
@@ -83,7 +83,7 @@ return nil
 
 //----------------------------------------------------------------//
 
-function unmask( cText )
+function Unmask( cText )
    
    local nLen := hb_bitAnd( hb_bPeek( cText, 2 ), 127 ) 
    local cMask, cData, cChar
@@ -131,7 +131,7 @@ return cHeader + hb_strToUTF8( cText )
 
 //----------------------------------------------------------------//
 
-function process( hSocket )
+function ServeClient( hSocket )
 
    local cRequest
    local nLen
