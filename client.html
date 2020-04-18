@@ -1,65 +1,65 @@
 <html lang="en">
    <head>  
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1"> 			
+ 	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 			
    </head>
    <style>
-		.myhead {			
-			padding: 5px;
-			background-color: white;
-			margin-bottom: 20px;
-		}
-		.myhead > span {
-			font-size: 25px;
-			color: red;
-			font-family: times, Times New Roman, times-roman, georgia, serif;
-			font-size: 28px;
-			line-height: 40px;
-			letter-spacing: -1px;color: #444;			
-		}
-		#mylogo {
-			width: 130px;
-			margin-left: 10px;
-			margin-right: 10px;
-			vertical-align: middle;
-		}
-		#content {
-			margin: 50px;
-		}
-		input[type=text], select {
-		  width: 50%;
-		  padding: 12px 20px;
-		  margin: 8px 0;
-		  display: inline-block;
-		  border: 1px solid #ccc;
-		  border-radius: 4px;
-		  box-sizing: border-box;
-		}
-		#btn {
-		  width: 15%;
-		  background-color: #4CAF50;
-		  color: white;
-		  padding: 13px 20px;
-		  margin: 8px 0;
-		  border: none;
-		  border-radius: 4px;
-		  cursor: pointer;
-		}
-		#btn:hover {
-		  background-color: #45a049;
-		}		
+	.myhead {			
+		padding: 5px;
+		background-color: white;
+		margin-bottom: 20px;
+	}
+	.myhead > span {
+		font-size: 25px;
+		color: red;
+		font-family: times, Times New Roman, times-roman, georgia, serif;
+		font-size: 28px;
+		line-height: 40px;
+		letter-spacing: -1px;color: #444;			
+	}
+	#mylogo {
+		width: 130px;
+		margin-left: 10px;
+		margin-right: 10px;
+		vertical-align: middle;
+	}
+	#content {
+		margin: 50px;
+	}
+	input[type=text], select {
+	  width: 50%;
+	  padding: 12px 20px;
+	  margin: 8px 0;
+	  display: inline-block;
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  box-sizing: border-box;
+	}
+	#btn {
+	  width: 15%;
+	  background-color: #4CAF50;
+	  color: white;
+	  padding: 13px 20px;
+	  margin: 8px 0;
+	  border: none;
+	  border-radius: 4px;
+	  cursor: pointer;
+	}
+	#btn:hover {
+	  background-color: #45a049;
+	}		
    </style>
    <body>
-		<div class="myhead">
-			<img id="harbour" src="https://bitbucket.org/fivetech/screenshots/downloads/harbour.jpg">
-			<span>Harbour websocket server - client demo</span>
-			<hr>
-		</div>
-		<div id="content">
-			<input type="text" id="msg">
-			<button id="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
-		</div>
+	<div class="myhead">
+		<img id="harbour" src="https://bitbucket.org/fivetech/screenshots/downloads/harbour.jpg">
+		<span>Harbour websocket server - client demo</span>
+		<hr>
+	</div>
+	<div id="content">
+		<input type="text" id="msg">
+		<button id="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+	</div>
       <script>
          var socket = new WebSocket( "ws://localhost:9000" );
          socket.onopen = function(e) {
