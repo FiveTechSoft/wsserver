@@ -64,4 +64,4 @@ How to test it:
 
 5. Write exit to tell the server to end your session. 
 
-Enjoy it 
+Enjoy it!
