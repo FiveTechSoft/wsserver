@@ -83,11 +83,17 @@
 		
 		<div id="content">
 			<a href='https://harbour.github.io'>
-			   <img id="harbour" title='The Harbour project' src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"></a><br>
-			<input type="text" id="msg"><br>
-			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value)">Send</button>
-			<button class="btn" id='onoff' onclick='OnOff()'>Disconnect</button>
-			<br><a style='font-size:20' href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a>
+			   <img id="harbour" title='The Harbour project' src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"></a>
+			<p><input type="text" id="msg"></p>
+			<p><small>
+				or fill with <input type="number" id="randomFillLen" min="0" value="10"> random characters
+				<button id="randomFill">Go</button>
+			</small></p>
+			<p>
+				<button class="btn" id='sendBtn'>Send</button>
+				<button class="btn" id='onoff'>Disconnect</button>
+			</p>
+			<p><a style='font-size:20' href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a></p>
 		</div>
 		
       <script>
@@ -140,6 +146,25 @@
 				document.getElementById( 'msg' ).innerHTML = 'Disconnect';
 			};			
 		 }
+
+		 document.getElementById("randomFill").addEventListener("click", () => {
+            const len = document.getElementById("randomFillLen").valueAsNumber;
+            let data = "";
+            for (let i = 0; i < len; i++) {
+               // A random character between 0x20 and 0x7E, inclusive. This
+               // excludes control characters (including tabs and newlines).
+               data += String.fromCodePoint(
+                  0x20 + Math.floor(Math.random() * 95)
+               );
+            }
+			document.getElementById("msg").value = data;
+         });
+
+		 document.getElementById("sendBtn").addEventListener("click", () => {
+			 Send(document.getElementById("msg").value);
+		 });
+		 
+		 document.getElementById("onoff").addEventListener("click", OnOff);
       </script>
    </body>
 </html>
