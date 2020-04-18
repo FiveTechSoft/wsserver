@@ -81,11 +81,12 @@
 		</div>
 		
 		<div id="content">
-			<img id="harbour" src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"><br>
+			<a href='https://harbour.github.io'>
+			   <img id="harbour" title='The Harbour project' src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"></a><br>
 			<input type="text" id="msg"><br>
-			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
-			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value )">Connect</button>
-			<br><a href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a>
+			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value)">Send</button>
+			<button class="btn" onclick="Send( 'exit' )">Disconnect</button>
+			<br><a style='font-size:20' href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a>
 		</div>
 		
       <script>
