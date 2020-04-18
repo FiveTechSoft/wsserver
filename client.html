@@ -86,40 +86,58 @@
 			   <img id="harbour" title='The Harbour project' src="https://github.com/FiveTechSoft/screenshots/blob/master/harbour.png?raw=true"></a><br>
 			<input type="text" id="msg"><br>
 			<button class="btn" onclick="Send( document.getElementById( 'msg' ).value)">Send</button>
-			<button class="btn" onclick="Send( 'exit' )">Disconnect</button>
+			<button class="btn" id='onoff' onclick='OnOff()'>Disconnect</button>
 			<br><a style='font-size:20' href="https://fivetechsoft.github.io/mod_harbour/">modharbour.org</a>
 		</div>
 		
       <script>
-         var socket = new WebSocket( "ws://localhost:9000" );
-
-         socket.onopen = function(e) {
-            alert("[open] Connection established");
-            alert("Sending to server");
-            socket.send( "Harbour websocket server" );
-         };
-
-         socket.onmessage = function(event) {
-            alert(`[message] Data received from server: ${event.data}`);
-         };
-
-         socket.onclose = function(event) {
-            if (event.wasClean) {
-               alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);   
-            } else {
-               // e.g. server process killed or network down
-               // event.code is usually 1006 in this case
-               alert('[close] Connection died');
-            }
-         };
-
-         socket.onerror = function(error) {
-            alert( 'Please run wsserver.exe on your computer and then refresh this page' ); // `[error] ${error.message}`);
-         };
+		 var socket;
+		 
+		 Connect();
 
          function Send( cMsg ) {
-            socket.send( cMsg );
-         }
+			if( socket != null )
+               socket.send( cMsg );
+		 }
+		 
+         function OnOff(){
+			 if( socket == null )
+				Connect();
+			 else
+			    Send( 'exit' ); 	
+		 }
+
+		 function Connect(){
+			socket = new WebSocket( "ws://localhost:9000" );
+
+			socket.onopen = function(e) {
+				alert("[open] Connection established");
+				alert("Sending to server");
+				socket.send( "Harbour websocket server" );
+				document.getElementById( 'onoff' ).innerHTML = 'Disconnect';
+			};
+
+			socket.onmessage = function(event) {
+				alert(`[message] Data received from server: ${event.data}`);
+			};
+
+			socket.onclose = function(event) {
+				if (event.wasClean) {
+					alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);   
+				} else {
+					// e.g. server process killed or network down
+					// event.code is usually 1006 in this case
+					alert('[close] Connection died');
+					socket = null;
+					document.getElementById( 'onoff' ).innerHTML = 'Connect';
+				}
+			};
+
+			socket.onerror = function(error) {
+				alert( 'Please run wsserver.exe on your computer and then refresh this page' ); // `[error] ${error.message}`);
+				document.getElementById( 'msg' ).innerHTML = 'Disconnect';
+			};			
+		 }
       </script>
    </body>
 </html>
