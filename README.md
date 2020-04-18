@@ -15,7 +15,7 @@ You can easily change its source code to implement any other conversation you ma
 
 How to test it:
 
-1. Build wsserver.exe using hbmk2 wsserver.prg. Use the hbmk2 flag -mt to build it multithreading! 
+1. Build wsserver.exe using hbmk2 wsserver.prg -mt. Use the hbmk2 flag -mt to build it multithreading! 
 
 2. Run wsserver.exe. It will display all messages that arrive to it. "loop" is shown on the screen. Press esc any time to end it.
 
