@@ -96,10 +96,10 @@
 		 Connect();
 
          function Send( cMsg ) {
-			if( socket != null )
-			   socket.send( cMsg );
-			else   
-   			   alert( 'Please run wsserver.exe first on your computer' );
+			if( socket == null )
+			   Connect();
+			
+			socket.send( cMsg );
 		 }
 		 
          function OnOff(){
