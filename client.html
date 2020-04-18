@@ -1,23 +1,75 @@
-<html>
-   <head>
+<html lang="en">
+   <head>  
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 			
    </head>
+   <style>
+		.myhead {			
+			padding: 5px;
+			background-color: white;
+			margin-bottom: 20px;
+		}
+		.myhead > span {
+			font-size: 25px;
+			color: red;
+			font-family: times, Times New Roman, times-roman, georgia, serif;
+			font-size: 28px;
+			line-height: 40px;
+			letter-spacing: -1px;color: #444;			
+		}
+		#mylogo {
+			width: 130px;
+			margin-left: 10px;
+			margin-right: 10px;
+			vertical-align: middle;
+		}
+		#content {
+			margin: 50px;
+		}
+		input[type=text], select {
+		  width: 70%;
+		  padding: 12px 20px;
+		  margin: 8px 0;
+		  display: inline-block;
+		  border: 1px solid #ccc;
+		  border-radius: 4px;
+		  box-sizing: border-box;
+		}
+		#btn {
+		  width: 25%;
+		  background-color: #4CAF50;
+		  color: white;
+		  padding: 13px 20px;
+		  margin: 8px 0;
+		  border: none;
+		  border-radius: 4px;
+		  cursor: pointer;
+		}
+		#btn:hover {
+		  background-color: #45a049;
+		}		
+   </style>
    <body>
-      <h2>Harbour websocket server - client demo</h2>
-      <input type="text" id="msg">
-      <button onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+		<div class="myhead">
+			<img id="mylogo" src="harbour.png">
+			<span>Harbour websocket server - client demo</span>
+			<hr>
+		</div>
+		<div id="content">
+			<input type="text" id="msg">
+			<button id="btn" onclick="Send( document.getElementById( 'msg' ).value )">Send</button>
+		</div>
       <script>
          var socket = new WebSocket( "ws://localhost:9000" );
-
          socket.onopen = function(e) {
             alert("[open] Connection established");
             alert("Sending to server");
             socket.send( "Harbour websocket server" );
          };
-
          socket.onmessage = function(event) {
             alert(`[message] Data received from server: ${event.data}`);
          };
-
          socket.onclose = function(event) {
             if (event.wasClean) {
                alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);   
@@ -27,11 +79,9 @@
                alert('[close] Connection died');
             }
          };
-
          socket.onerror = function(error) {
             alert(`[error] ${error.message}`);
          };
-
          function Send( cMsg ) {
             socket.send( cMsg );
          }
