@@ -17,7 +17,7 @@ How to test it:
 
 2. Run wsserver.exe. It will display all messages that arrive to it. "loop" is shown on the screen. Press esc any time to end it.
 
-3. Open this HTML page from your browser:
+3. Open this HTML page from your browser: [click here](https://raw.githubusercontent.com/FiveTechSoft/wsserver/master/client.html)
 
 https://github.com/FiveTechSoft/wsserver/blob/master/client.html
 
