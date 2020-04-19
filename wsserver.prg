@@ -113,7 +113,7 @@ return cText
 
 //----------------------------------------------------------------//
 
-function ULL2Bin( n )
+function NetworkULL2Bin( n )
 
    local nBytesLeft := 64
    local cBytes := ""
@@ -127,21 +127,41 @@ return cBytes
 
 //----------------------------------------------------------------//
 
-function Mask( cText )
+function Mask( cText, lEnd )
 
-   local nLen := Len(  cText ) 
-   local cHeader   
+   local nLen := Len( cText ) 
+   local cHeader 
+   local lMsgIsComplete := .T., lMsgIsText := .T.
+   local nFirstByte := 0
+                  
+   hb_default( @lEnd, .F. )
 
+   if lMsgIsComplete
+      nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
+   endif
+
+   if lMsgIsText .and. ! lEnd
+      nFirstByte = hb_bitSet( nFirstByte, 0 ) // 1000 0001
+   endif
+
+   if lEnd
+      nFirstByte = hb_bitSet( nFirstByte, 3 ) // 1000 1001
+   endif   
+   
    do case
+      case lEnd
+         cHeader = Chr( nFirstByte ) + ;
+                   Chr( hb_BitShift( nLen, -8 ) ) + Chr( hb_BitAnd( nLen, 0xFF ) ) 
+
       case nLen <= 125
-         cHeader = Chr( 129 ) + Chr( nLen )   
+         cHeader = Chr( nFirstByte ) + Chr( nLen )   
 
       case nLen < 65536
-         cHeader = Chr( 129 ) + Chr( 126 ) + ;
+         cHeader = Chr( nFirstByte ) + Chr( 126 ) + ;
                    Chr( hb_BitShift( nLen, -8 ) ) + Chr( hb_BitAnd( nLen, 0xFF ) )
          
       otherwise 
-         cHeader = Chr( 129 ) + Chr( 127 ) + ULL2Bin( nLen )   
+         cHeader = Chr( nFirstByte ) + Chr( 127 ) + NetworkULL2Bin( nLen )   
    endcase
 
 return cHeader + cText   
@@ -181,8 +201,9 @@ function ServeClient( hSocket )
       endif 
 
       if cRequest == "exit"
+         hb_socketSend( hSocket, Mask( "That was all folks", .T. ) )  // Close handShake
          ? "exit"
-         exit
+         // exit
       endif
    end
 
