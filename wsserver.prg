@@ -147,12 +147,8 @@ function Mask( cText, lEnd )
    if lEnd
       nFirstByte = hb_bitSet( nFirstByte, 3 ) // 1000 1001
    endif   
-   
-   do case
-      case lEnd
-         cHeader = Chr( nFirstByte ) + ;
-                   Chr( hb_BitShift( nLen, -8 ) ) + Chr( hb_BitAnd( nLen, 0xFF ) ) 
 
+   do case
       case nLen <= 125
          cHeader = Chr( nFirstByte ) + Chr( nLen )   
 
@@ -201,9 +197,8 @@ function ServeClient( hSocket )
       endif 
 
       if cRequest == "exit"
-         hb_socketSend( hSocket, Mask( "That was all folks", .T. ) )  // Close handShake
-         ? "exit"
-         // exit
+         hb_socketSend( hSocket, Mask( "exit", .T. ) )  // Close handShake
+         exit
       endif
    end
 
