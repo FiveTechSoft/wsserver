@@ -111,6 +111,20 @@ return cText
 
 //----------------------------------------------------------------//
 
+function ULL2Bin( n )
+
+   local nBytesLeft := 64
+   local cBytes := ""
+
+   while nBytesLeft > 0
+      nBytesLeft -= 8
+      cBytes += Chr( hb_BitShift( hb_BitShift( n, -nBytesLeft ), 0xFF ) )
+   end
+
+return cBytes
+
+//----------------------------------------------------------------//
+
 function Mask( cText )
 
    local nLen := Len(  cText ) 
@@ -120,10 +134,12 @@ function Mask( cText )
       case nLen <= 125
          cHeader = Chr( 129 ) + Chr( nLen )   
 
-      case nLen > 123 .and. nLen < 65536
+      case nLen < 65536
+         cHeader = Chr( 129 ) + Chr( 126 ) + ;
+                   Chr( hb_BitShift( nLen, -8 ) ) + Chr( hb_BitAnd( nLen, 0xFF ) )
          
       otherwise 
-         // cHeader = Pack( 'CCNN', 129, 127, nLen )    
+         cHeader = Chr( 129 ) + Chr( 127 ) + ULL2Bin( nLen )   
    endcase
 
 return cHeader + cText   
