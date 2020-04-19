@@ -8,8 +8,6 @@ Here you have a first prototype of a Harbour websocket server:
 
 Basically this server allows you to communicate between a web browser and a Harbour app (no matter where it is!), using websockets.
 
-It is actually working fine for messages <= 125 chars. I expect to complete it for all messages sizes soon. Help is welcome :-)
-
 In this version the websocket server implements an echo service, just to check that it properly works. It sends you back whatever you may send to it.
 You can easily change its source code to implement any other conversation you may have in mind. It uses the port 9000 but you may use any other, just remember to change it in both wsserver.prg and in client.html
 
