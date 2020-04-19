@@ -7,12 +7,24 @@
 #define CRLF       Chr( 13 ) + Chr( 10 )
 #define FILEHEADER "data:application/octet-stream;base64,"
 #define JSONHEADER "data:application/json;base64,"
+#define HTMLHEADER "data:text/html;base64,"
 
 //----------------------------------------------------------------//
 
 function Main()
 
    local hListen, hSocket
+
+   if ! File( "log.dbf" )
+      DbCreate( "log.dbf", { { "COMPLETE",  "L",  1, 0 },;
+                             { "OPCODE",    "N",  3, 0 },;
+                             { "MASKED",    "L",  1, 0 },;
+                             { "FRLENGTH",  "N",  6, 0 },;
+                             { "PAYLENGTH", "N",  6, 0 },;
+                             { "MASKKEY",   "C",  4, 0 },;
+                             { "DATA",      "M", 10, 0 },;
+                             { "HEADER",    "C", 50, 0 } } )
+   endif
 
    if ! hb_mtvm()
       ? "multithread support required"
@@ -84,32 +96,64 @@ return nil
 
 //----------------------------------------------------------------//
 
-function Unmask( cText )
+function Unmask( cBytes )
    
-   local nLen := hb_bitAnd( hb_bPeek( cText, 2 ), 127 ) 
-   local cMask, cData, cChar
+   local lComplete := hb_bitTest( hb_bPeek( cBytes, 1 ), 7 )
+   local nOpcode   := hb_bitAnd( hb_bPeek( cBytes, 1 ), 15 )
+   local nFrameLen := hb_bitAnd( hb_bPeek( cBytes, 2 ), 127 ) 
+   local nLength, cMask, cData, cChar, cHeader := ""
 
    do case
-      case nLen = 126
-         cMask = SubStr( cText, 5, 4 )
-         cData = SubStr( cText, 9 )
+      case nFrameLen <= 125
+         nLength = nFrameLen
+         cMask = SubStr( cBytes, 3, 4 )
+         cData = SubStr( cBytes, 7 )
 
-      case nLen = 127   
-         cMask = SubStr( cText, 11, 4 )
-         cData = SubStr( cText, 15 )
-         
-      otherwise
-         cMask = SubStr( cText, 3, 4 )
-         cData = SubStr( cText, 7 )
+      case nFrameLen = 126
+         nLength = ( hb_bPeek( cBytes, 3 ) * 256 ) + hb_bPeek( cBytes, 4 )
+         cMask   = SubStr( cBytes, 5, 4 )
+         cData   = SubStr( cBytes, 9 )
+
+      case nFrameLen = 127  
+         nLength = 0  
+         cMask   = SubStr( cBytes, 11, 4 )
+         cData   = SubStr( cBytes, 15 )
    endcase 
 
-   cText = ""
+   cBytes = ""
    for each cChar in cData
-      cText += Chr( hb_bitXor( Asc( cChar ),;
-                    hb_bPeek( cMask, ( ( cChar:__enumIndex() - 1 ) % 4 ) + 1 ) ) ) 
+      cBytes += Chr( hb_bitXor( Asc( cChar ),;
+                     hb_bPeek( cMask, ( ( cChar:__enumIndex() - 1 ) % 4 ) + 1 ) ) ) 
    next   
 
-return cText 
+   do case
+      case Left( cBytes, Len( FILEHEADER ) ) == FILEHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( FILEHEADER ) + 1 ) )
+         cHeader = FILEHEADER 
+
+      case Left( cBytes, Len( JSONHEADER ) ) == JSONHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( JSONHEADER ) + 1 ) )
+         cHeader = JSONHEADER
+
+      case Left( cBytes, Len( HTMLHEADER ) ) == HTMLHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( HTMLHEADER ) + 1 ) )
+         cheader = HTMLHEADER
+   endcase
+
+   APPEND BLANK
+   if log->( Rlock() )
+      log->complete  := lComplete
+      log->opcode    := nOpcode
+      log->masked    := .T.
+      log->frlength  := nFrameLen 
+      log->paylength := nLength
+      log->maskkey   := cMask
+      log->data      := cBytes
+      log->header    := cHeader
+      log->( DbUnLock() )
+   endif    
+
+return cBytes 
 
 //----------------------------------------------------------------//
 
@@ -166,30 +210,21 @@ return cHeader + cText
 
 function ServeClient( hSocket )
 
-   local cRequest
-   local nLen
-   local cBuf := Space( 4096 )
+   local cRequest, cBuffer := Space( 4096 ), nLen
 
-   hb_socketRecv( hSocket, @cBuf,,, 1024 )
-   HandShaking( hSocket, AllTrim( cBuf ) )
+   hb_socketRecv( hSocket, @cBuffer,,, 1024 )
+   HandShaking( hSocket, RTrim( cBuffer ) )
 
    ? "new client connected"
 
+   USE log SHARED
+
    while .T.
-      cBuf = Space( 10000 )
+      cBuffer  = Space( 10000 )
       cRequest = ""
 
-      if ( nLen := hb_socketRecv( hSocket, @cBuf,,, TIMEOUT ) ) > 0  
-         cRequest = Left( cBuf, nLen )
-         cRequest = UnMask( cRequest )
-         
-         if Left( cRequest, Len( FILEHEADER ) ) == FILEHEADER
-            cRequest = hb_base64Decode( SubStr( cRequest, Len( FILEHEADER ) + 1 ) )
-         endif
-         
-         if Left( cRequest, Len( JSONHEADER ) ) == JSONHEADER
-            cRequest = hb_base64Decode( SubStr( cRequest, Len( JSONHEADER ) + 1 ) )
-         endif
+      if ( nLen := hb_socketRecv( hSocket, @cBuffer,,, TIMEOUT ) ) > 0  
+         cRequest = UnMask( Left( cBuffer, nLen ) )
          
          do case
             case cRequest == "exit"
@@ -214,6 +249,8 @@ function ServeClient( hSocket )
 
    hb_socketShutdown( hSocket )
    hb_socketClose( hSocket )
+
+   USE
 
 return nil
 
