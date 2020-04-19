@@ -6,6 +6,7 @@
 #define TIMEOUT    3000    // 3 seconds
 #define CRLF       Chr( 13 ) + Chr( 10 )
 #define FILEHEADER "data:application/octet-stream;base64,"
+#define JSONHEADER "data:application/json;base64,"
 
 //----------------------------------------------------------------//
 
@@ -167,6 +168,9 @@ function ServeClient( hSocket )
          cRequest = UnMask( cRequest )
          if Left( cRequest, Len( FILEHEADER ) ) == FILEHEADER
             cRequest = hb_base64Decode( SubStr( cRequest, Len( FILEHEADER ) + 1 ) )
+         endif
+         if Left( cRequest, Len( JSONHEADER ) ) == JSONHEADER
+            cRequest = hb_base64Decode( SubStr( cRequest, Len( JSONHEADER ) + 1 ) )
          endif
          ? cRequest   
          hb_socketSend( hSocket, Mask( cRequest ) )
