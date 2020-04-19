@@ -19,7 +19,7 @@ How to test it:
 
 3. Open this HTML page from your browser: [click here](https://fivetechsoft.github.io//wsserver/client.html)
 
-https://github.com/FiveTechSoft/wsserver/blob/master/client.html
+   https://fivetechsoft.github.io//wsserver/client.html
 
 4. Whatever you send to the server from the web page, it will get back to you (sort of a karma reminder :-)
 
