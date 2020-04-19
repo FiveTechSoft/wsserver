@@ -118,20 +118,16 @@
 			};
 
 			socket.onmessage = function( event ) {
-				// alert(`[message] Data received from server: ${event.data}`);
 				document.getElementById( 'output' ).innerHTML += event.data + '\n';
 			};
 
 			socket.onclose = function( event ) {
-				if (event.wasClean) {
-					alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);   
-				} else {
-					// e.g. server process killed or network down
-					// event.code is usually 1006 in this case
-					alert('[close] Connection died');
-					socket = null;
-					document.getElementById( 'onoff' ).innerHTML = 'Connect';
-				}
+				document.getElementById( 'output' ).innerHTML += event.code + '\n';
+				document.getElementById( 'output' ).innerHTML += event.reason + '\n';
+				document.getElementById( 'output' ).innerHTML += ( ! event.wasClean ? "": "not " ) + 
+				                                                   "clean exit" + '\n';
+				socket = null;
+				document.getElementById( 'onoff' ).innerHTML = 'Connect';
 			};
 
 			socket.onerror = function(error) {

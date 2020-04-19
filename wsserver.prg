@@ -140,7 +140,7 @@ function Mask( cText, lEnd )
       nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
    endif
 
-   if lMsgIsText .and. ! lEnd
+   if lMsgIsText 
       nFirstByte = hb_bitSet( nFirstByte, 0 ) // 1000 0001
    endif
 
@@ -182,24 +182,32 @@ function ServeClient( hSocket )
       if ( nLen := hb_socketRecv( hSocket, @cBuf,,, TIMEOUT ) ) > 0  
          cRequest = Left( cBuf, nLen )
          cRequest = UnMask( cRequest )
+         
          if Left( cRequest, Len( FILEHEADER ) ) == FILEHEADER
             cRequest = hb_base64Decode( SubStr( cRequest, Len( FILEHEADER ) + 1 ) )
          endif
+         
          if Left( cRequest, Len( JSONHEADER ) ) == JSONHEADER
             cRequest = hb_base64Decode( SubStr( cRequest, Len( JSONHEADER ) + 1 ) )
          endif
-         ? cRequest   
-         hb_socketSend( hSocket, Mask( cRequest ) )
-      // else
+         
+         do case
+            case cRequest == "exit"
+                 hb_socketSend( hSocket, Mask( "exiting", .T. ) )  // Close handShake
+                 
+            case cRequest == "exiting" // client answered to Close handShake
+                 exit
+                 
+            otherwise     
+                  ? cRequest
+                  hb_socketSend( hSocket, Mask( cRequest ) )
+         endcase
+
+         // else
          //    if nLen == -1
          //       ? "recv() error:", hb_socketGetError() 
          //    endif
       endif 
-
-      if cRequest == "exit"
-         hb_socketSend( hSocket, Mask( "exit", .T. ) )  // Close handShake
-         exit
-      endif
    end
 
    ? "close socket"
