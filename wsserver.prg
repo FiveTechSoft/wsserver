@@ -176,7 +176,7 @@ function NetworkBin2ULL( cBytes )
    local cByte, n := 0
    
    for each cByte in cBytes
-      n += Asc( cByte ) * ( 256 ^ ( 8 - cByte:__enumIndex() ) )
+      n += hb_BitShift( Asc( cByte ), 64 - cByte:__enumIndex() * 8 )
    next
    
 return n
