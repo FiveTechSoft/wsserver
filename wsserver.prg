@@ -1,10 +1,11 @@
 #include "inkey.ch"
 #include "hbsocket.ch"
 
-#define ADDRESS  "127.0.0.1"
-#define PORT     9000
-#define TIMEOUT  3000    // 3 seconds
-#define CRLF     Chr( 13 ) + Chr( 10 )
+#define ADDRESS    "127.0.0.1"
+#define PORT       9000
+#define TIMEOUT    3000    // 3 seconds
+#define CRLF       Chr( 13 ) + Chr( 10 )
+#define FILEHEADER "data:application/octet-stream;base64,"
 
 //----------------------------------------------------------------//
 
@@ -34,7 +35,7 @@ function Main()
    while .T.
       if Empty( hSocket := hb_socketAccept( hListen,, TIMEOUT ) )
          if hb_socketGetError() == HB_SOCKET_ERR_TIMEOUT
-            ? "loop"
+            // ? "loop"
          ELSE
             ? "accept error " + hb_ntos( hb_socketGetError() )
          endif
@@ -164,7 +165,10 @@ function ServeClient( hSocket )
       if ( nLen := hb_socketRecv( hSocket, @cBuf,,, TIMEOUT ) ) > 0  
          cRequest = Left( cBuf, nLen )
          cRequest = UnMask( cRequest )
-         ? cRequest
+         if Left( cRequest, Len( FILEHEADER ) ) == FILEHEADER
+            cRequest = hb_base64Decode( SubStr( cRequest, Len( FILEHEADER ) + 1 ) )
+         endif
+         ? cRequest   
          hb_socketSend( hSocket, Mask( cRequest ) )
       // else
          //    if nLen == -1
@@ -172,7 +176,7 @@ function ServeClient( hSocket )
          //    endif
       endif 
 
-      if "exit" $ cRequest
+      if cRequest == "exit"
          ? "exit"
          exit
       endif
