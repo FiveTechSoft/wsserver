@@ -17,9 +17,7 @@ How to test it:
 
 2. Run wsserver.exe. It will display all messages that arrive to it. "loop" is shown on the screen. Press esc any time to end it.
 
-3. Open this HTML page from your browser:
-
-   https://fivetechsoft.github.io//wsserver/client.html
+3. [Click here](https://fivetechsoft.github.io//wsserver/client.html)
 
 4. Whatever you send to the server from the web page, it will get back to you (sort of a karma reminder :-)
 
