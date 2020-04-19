@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "c:\\harbour\\bin\\hbmk2",
+            "args": [
+                "${fileBasenameNoExtension}", "-mt", "-comp=bcc", "&&", "${fileBasenameNoExtension}.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "options": {
+                "env": {
+                    "PATH": "c:\\bcc7\\bin"
+                }
+            }
+        }    
+    ],
+}
