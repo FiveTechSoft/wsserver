@@ -115,7 +115,7 @@ function Unmask( cBytes )
          cData   = SubStr( cBytes, 9 )
 
       case nFrameLen = 127  
-         nLength = 0  
+         nLength = NetworkBin2ULL( SubStr( cBytes, 3, 8 ) )  
          cMask   = SubStr( cBytes, 11, 4 )
          cData   = SubStr( cBytes, 15 )
    endcase 
@@ -168,6 +168,18 @@ function NetworkULL2Bin( n )
    end
 
 return cBytes
+
+//----------------------------------------------------------------//
+
+function NetworkBin2ULL( cBytes )
+
+   local cByte, n := 0
+   
+   for each cByte in cBytes
+      n += Asc( cByte ) * ( 256 ^ ( 8 - cByte:__enumIndex() ) )
+   next
+   
+return n
 
 //----------------------------------------------------------------//
 
