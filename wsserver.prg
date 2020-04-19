@@ -164,7 +164,7 @@ function NetworkULL2Bin( n )
 
    while nBytesLeft > 0
       nBytesLeft -= 8
-      cBytes += Chr( hb_BitShift( hb_BitShift( n, -nBytesLeft ), 0xFF ) )
+      cBytes += Chr( hb_BitAnd( hb_BitShift( n, -nBytesLeft ), 0xFF ) )
    end
 
 return cBytes
