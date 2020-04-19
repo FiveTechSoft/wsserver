@@ -160,7 +160,7 @@ function ServeClient( hSocket )
    ? "new client connected"
 
    while .T.
-      cBuf := Space( 4096 )
+      cBuf = Space( 10000 )
       cRequest = ""
 
       if ( nLen := hb_socketRecv( hSocket, @cBuf,,, TIMEOUT ) ) > 0  
