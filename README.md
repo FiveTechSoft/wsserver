@@ -25,4 +25,4 @@ How to test it:
 
 Enjoy it!
 
-[![](https://bitbucket.org/fivetech/screenshots/downloads/harbour.jpg)](https://harbour.github.io "The Harbour Project")
+[![](https://github.com/FiveTechSoft/screenshots/blob/master/harbour_letters.jpg?raw=true)](https://harbour.github.io "The Harbour Project")
