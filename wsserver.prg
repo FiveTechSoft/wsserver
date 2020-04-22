@@ -20,7 +20,7 @@ function Main()
                              { "OPCODE",    "N",  3, 0 },;
                              { "MASKED",    "L",  1, 0 },;
                              { "FRLENGTH",  "N",  6, 0 },;
-                             { "PAYLENGTH", "N",  6, 0 },;
+                             { "PAYLENGTH", "N", 10, 0 },;
                              { "MASKKEY",   "C",  4, 0 },;
                              { "DATA",      "M", 10, 0 },;
                              { "HEADER",    "C", 50, 0 } } )
