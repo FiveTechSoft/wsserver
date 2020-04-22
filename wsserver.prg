@@ -1,7 +1,7 @@
 #include "inkey.ch"
 #include "hbsocket.ch"
 
-#define ADDRESS    "127.0.0.1"
+#define ADDRESS    "0.0.0.0" // Binding to all available networks, use "127.0.0.1" for localhost (only local connections)
 #define PORT       9000
 #define TIMEOUT    3000    // 3 seconds
 #define CRLF       Chr( 13 ) + Chr( 10 )
