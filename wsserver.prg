@@ -1,7 +1,7 @@
 #include "inkey.ch"
 #include "hbsocket.ch"
 
-#define ADDRESS    "0.0.0.0" // Binding to all available networks, use "127.0.0.1" for localhost (only local connections)
+#define ADDRESS    "0.0.0.0"
 #define PORT       9000
 #define TIMEOUT    3000    // 3 seconds
 #define CRLF       Chr( 13 ) + Chr( 10 )
@@ -232,29 +232,35 @@ function ServeClient( hSocket )
    USE log SHARED
 
    while .T.
-      cBuffer  = Space( 10000 )
       cRequest = ""
+      nLen = 1
 
-      if ( nLen := hb_socketRecv( hSocket, @cBuffer,,, TIMEOUT ) ) > 0  
-         cRequest = UnMask( Left( cBuffer, nLen ) )
-         
-         do case
-            case cRequest == "exit"
-                 hb_socketSend( hSocket, Mask( "exiting", .T. ) )  // Close handShake
-                 
-            case cRequest == "exiting" // client answered to Close handShake
-                 exit
-                 
-            otherwise     
+      while nLen > 0
+         cBuffer := Space( 4096 )
+         if ( nLen := hb_socketRecv( hSocket, @cBuffer,,, TIMEOUT ) ) > 0  
+            cRequest += Left( cBuffer, nLen )
+         else
+            if nLen == -1 .and. hb_socketGetError() == HB_SOCKET_ERR_TIMEOUT
+               nLen = 0
+            endif
+         endif
+      end
+
+      cRequest = UnMask( cRequest )
+      
+      do case
+         case cRequest == "exit"
+               hb_socketSend( hSocket, Mask( "exiting", .T. ) )  // Close handShake
+               
+         case cRequest == "exiting" // client answered to Close handShake
+               exit
+               
+         otherwise
+               if ! Empty( cRequest )     
                   ? cRequest
                   hb_socketSend( hSocket, Mask( cRequest ) )
-         endcase
-
-         // else
-         //    if nLen == -1
-         //       ? "recv() error:", hb_socketGetError() 
-         //    endif
-      endif 
+               endif   
+      endcase
    end
 
    ? "close socket"
