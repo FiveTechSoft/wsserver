@@ -9,6 +9,13 @@
 #define JSONHEADER "data:application/json;base64,"
 #define HTMLHEADER "data:text/html;base64,"
 
+#define OPC_CONT   0x00
+#define OPC_TEXT   0x01
+#define OPC_BIN    0x02
+#define OPC_CLOSE  0x08
+#define OPC_PING   0x09
+#define OPC_PONG   0x0A
+
 //----------------------------------------------------------------//
 
 function Main()
@@ -96,12 +103,13 @@ return nil
 
 //----------------------------------------------------------------//
 
-function Unmask( cBytes )
+function Unmask( cBytes, nOpcode )
    
    local lComplete := hb_bitTest( hb_bPeek( cBytes, 1 ), 7 )
-   local nOpcode   := hb_bitAnd( hb_bPeek( cBytes, 1 ), 15 )
    local nFrameLen := hb_bitAnd( hb_bPeek( cBytes, 2 ), 127 ) 
    local nLength, cMask, cData, cChar, cHeader := ""
+
+   nOpcode := hb_bitAnd( hb_bPeek( cBytes, 1 ), 15 )
 
    do case
       case nFrameLen <= 125
@@ -183,26 +191,21 @@ return n
 
 //----------------------------------------------------------------//
 
-function Mask( cText, lEnd )
+function Mask( cText, nOPCode )
 
    local nLen := Len( cText ) 
    local cHeader 
-   local lMsgIsComplete := .T., lMsgIsText := .T.
+   local lMsgIsComplete := .T.
    local nFirstByte := 0
                   
-   hb_default( @lEnd, .F. )
+   hb_default( @nOPCode, OPC_TEXT )
 
    if lMsgIsComplete
       nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
    endif
 
-   if lMsgIsText 
-      nFirstByte = hb_bitSet( nFirstByte, 0 ) // 1000 0001
-   endif
-
-   if lEnd
-      nFirstByte = hb_bitSet( nFirstByte, 3 ) // 1000 1001
-   endif   
+   // setting OP code
+   nFirstByte := hb_bitOr( nFirstByte, nOPCode )  // 1000 XXXX -> is set
 
    do case
       case nLen <= 125
@@ -222,7 +225,7 @@ return cHeader + cText
 
 function ServeClient( hSocket )
 
-   local cRequest, cBuffer := Space( 4096 ), nLen
+   local cRequest, cBuffer := Space( 4096 ), nLen, nOpcode
 
    hb_socketRecv( hSocket, @cBuffer,,, 1024 )
    HandShaking( hSocket, RTrim( cBuffer ) )
@@ -245,22 +248,22 @@ function ServeClient( hSocket )
             endif
          endif
       end
-
-      cRequest = UnMask( cRequest )
       
-      do case
-         case cRequest == "exit"
-               hb_socketSend( hSocket, Mask( "exiting", .T. ) )  // Close handShake
+      if !Empty(cRequest)
+         cRequest:= UnMask( cRequest, @nOpcode )
+         
+         do case
+            case cRequest == "exit"
+               hb_socketSend( hSocket, Mask( "exiting", OPC_CLOSE ) )   // close handShake
                
-         case cRequest == "exiting" // client answered to Close handShake
+            case cRequest == "exiting"                                  // client answered to close handShake
                exit
                
-         otherwise
-               if ! Empty( cRequest )     
-                  ? cRequest
-                  hb_socketSend( hSocket, Mask( cRequest ) )
-               endif   
-      endcase
+            otherwise
+               ? cRequest
+               hb_socketSend( hSocket, Mask( cRequest ) )
+         endcase
+      endif
    end
 
    ? "close socket"
