@@ -249,7 +249,7 @@ function ServeClient( hSocket )
          endif
       end
       
-      if !Empty(cRequest)
+      if ! Empty( cRequest )
          cRequest:= UnMask( cRequest, @nOpcode )
          
          do case
