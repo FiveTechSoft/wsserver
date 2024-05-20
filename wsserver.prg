@@ -5,9 +5,6 @@
 #define PORT       9000
 #define TIMEOUT    50    
 #define CRLF       Chr( 13 ) + Chr( 10 )
-#define FILEHEADER "data:application/octet-stream;base64,"
-#define JSONHEADER "data:application/json;base64,"
-#define HTMLHEADER "data:text/html;base64,"
 
 #define OPC_CONT   0x00
 #define OPC_TEXT   0x01
@@ -138,7 +135,11 @@ function Unmask( cBytes, nOpcode )
    cHeader = SubStr( cBytes, 1, nCommaPos - 1 )
    if Right( cHeader, 6 ) == "base64"
       cBytes = hb_base64Decode( SubStr( cBytes, nCommaPos + 1 ) )
-   endif  
+   else
+      cHeader = ""      
+   endif
+
+   cBytes = HB_UTF8ToStr( cBytes ) 
 
    APPEND BLANK
    if log->( Rlock() )
