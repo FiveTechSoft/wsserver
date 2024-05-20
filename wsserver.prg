@@ -139,8 +139,6 @@ function Unmask( cBytes, nOpcode )
       cHeader = ""      
    endif
 
-   cBytes = HB_UTF8ToStr( cBytes ) 
-
    APPEND BLANK
    if log->( Rlock() )
       log->complete  := lComplete
