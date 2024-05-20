@@ -124,7 +124,7 @@
 			socket.onclose = function( event ) {
 				document.getElementById( 'output' ).innerHTML += event.code + '\n';
 				document.getElementById( 'output' ).innerHTML += event.reason + '\n';
-				document.getElementById( 'output' ).innerHTML += ( ! event.wasClean ? "": "not " ) + 
+				document.getElementById( 'output' ).innerHTML += ( event.wasClean ? "": "not " ) + 
 				                                                   "clean exit" + '\n';
 				socket = null;
 				document.getElementById( 'onoff' ).innerHTML = 'Connect';
