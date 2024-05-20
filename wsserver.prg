@@ -3,8 +3,11 @@
 
 #define ADDRESS    "0.0.0.0"
 #define PORT       9000
-#define TIMEOUT    3000    // 3 seconds
+#define TIMEOUT    50    // 3 seconds
 #define CRLF       Chr( 13 ) + Chr( 10 )
+#define FILEHEADER "data:application/octet-stream;base64,"
+#define JSONHEADER "data:application/json;base64,"
+#define HTMLHEADER "data:text/html;base64,"
 
 #define OPC_CONT   0x00
 #define OPC_TEXT   0x01
@@ -105,7 +108,6 @@ function Unmask( cBytes, nOpcode )
    local lComplete := hb_bitTest( hb_bPeek( cBytes, 1 ), 7 )
    local nFrameLen := hb_bitAnd( hb_bPeek( cBytes, 2 ), 127 ) 
    local nLength, cMask, cData, cChar, cHeader := ""
-   local nCommaPos
 
    nOpcode := hb_bitAnd( hb_bPeek( cBytes, 1 ), 15 )
 
@@ -132,17 +134,19 @@ function Unmask( cBytes, nOpcode )
                      hb_bPeek( cMask, ( ( cChar:__enumIndex() - 1 ) % 4 ) + 1 ) ) ) 
    next   
 
-   nCommaPos = At( ",", cBytes )
-   if nCommaPos > 0 
-      cHeader = SubStr( cBytes, 1, nCommaPos - 1 )
-      if Right( cHeader, 6 ) == "base64"
-         cBytes = hb_base64Decode( SubStr( cBytes, nCommaPos + 1 ) )
-      endif
-   else
-      cHeader = ""      
-   endif
+   do case
+      case Left( cBytes, Len( FILEHEADER ) ) == FILEHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( FILEHEADER ) + 1 ) )
+         cHeader = FILEHEADER 
 
-   cBytes = HB_UTF8ToStr( cBytes ) 
+      case Left( cBytes, Len( JSONHEADER ) ) == JSONHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( JSONHEADER ) + 1 ) )
+         cHeader = JSONHEADER
+
+      case Left( cBytes, Len( HTMLHEADER ) ) == HTMLHEADER
+         cBytes = hb_base64Decode( SubStr( cBytes, Len( HTMLHEADER ) + 1 ) )
+         cheader = HTMLHEADER
+   endcase
 
    APPEND BLANK
    if log->( Rlock() )
@@ -152,7 +156,7 @@ function Unmask( cBytes, nOpcode )
       log->frlength  := nFrameLen 
       log->paylength := nLength
       log->maskkey   := cMask
-      log->data      := cBytes 
+      log->data      := cBytes
       log->header    := cHeader
       log->( DbUnLock() )
    endif    
@@ -189,14 +193,13 @@ return n
 
 function Mask( cText, nOPCode )
 
-   local nLen := Len( cText := HB_StrToUTF8( cText ) ) 
+   local nLen := Len( cText )
    local cHeader 
    local nFirstByte := 0
                   
    hb_default( @nOPCode, OPC_TEXT )
 
    nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
-
    // setting OP code
    nFirstByte := hb_bitOr( nFirstByte, nOPCode )  // 1000 XXXX -> is set
 
@@ -246,10 +249,10 @@ function ServeClient( hSocket )
          cRequest:= UnMask( cRequest, @nOpcode )
          
          do case
-            case cRequest == "exit"
-               hb_socketSend( hSocket, Mask( "exiting", OPC_CLOSE ) )   // close handShake
+            case cRequest == "exit"          // 1000 value in hex and bytes swapped 
+               hb_socketSend( hSocket, Mask( I2Bin( 0xE803 ) + "exiting", OPC_CLOSE ) )   // close handShake
                
-            case cRequest == "exiting"                                  // client answered to close handShake
+            case cRequest == I2Bin( 0xE803 ) + "exiting"                                  // client answered to close handShake
                exit
                
             otherwise
