@@ -133,10 +133,16 @@ function Unmask( cBytes, nOpcode )
    next   
 
    nCommaPos = At( ",", cBytes )
-   cHeader = SubStr( cBytes, 1, nCommaPos - 1 )
-   if Right( cHeader, 6 ) == "base64"
-      cBytes = hb_base64Decode( SubStr( cBytes, nCommaPos + 1 ) )
-   endif   
+   if nCommaPos > 0 
+      cHeader = SubStr( cBytes, 1, nCommaPos - 1 )
+      if Right( cHeader, 6 ) == "base64"
+         cBytes = hb_base64Decode( SubStr( cBytes, nCommaPos + 1 ) )
+      endif
+   else
+      cHeader = ""      
+   endif
+
+   cBytes = HB_UTF8ToStr( cBytes ) 
 
    APPEND BLANK
    if log->( Rlock() )
@@ -146,7 +152,7 @@ function Unmask( cBytes, nOpcode )
       log->frlength  := nFrameLen 
       log->paylength := nLength
       log->maskkey   := cMask
-      log->data      := cBytes
+      log->data      := cBytes 
       log->header    := cHeader
       log->( DbUnLock() )
    endif    
@@ -183,16 +189,13 @@ return n
 
 function Mask( cText, nOPCode )
 
-   local nLen := Len( cText ) 
+   local nLen := Len( cText := HB_StrToUTF8( cText ) ) 
    local cHeader 
-   local lMsgIsComplete := .T.
    local nFirstByte := 0
                   
    hb_default( @nOPCode, OPC_TEXT )
 
-   if lMsgIsComplete
-      nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
-   endif
+   nFirstByte = hb_bitSet( nFirstByte, 7 ) // 1000 0000
 
    // setting OP code
    nFirstByte := hb_bitOr( nFirstByte, nOPCode )  // 1000 XXXX -> is set
