@@ -3,7 +3,7 @@
 
 #define ADDRESS    "0.0.0.0"
 #define PORT       9000
-#define TIMEOUT    50    // 3 seconds
+#define TIMEOUT    50    
 #define CRLF       Chr( 13 ) + Chr( 10 )
 #define FILEHEADER "data:application/octet-stream;base64,"
 #define JSONHEADER "data:application/json;base64,"
@@ -107,7 +107,7 @@ function Unmask( cBytes, nOpcode )
    
    local lComplete := hb_bitTest( hb_bPeek( cBytes, 1 ), 7 )
    local nFrameLen := hb_bitAnd( hb_bPeek( cBytes, 2 ), 127 ) 
-   local nLength, cMask, cData, cChar, cHeader := ""
+   local nLength, cMask, cData, cChar, cHeader := "", nCommaPos
 
    nOpcode := hb_bitAnd( hb_bPeek( cBytes, 1 ), 15 )
 
@@ -134,19 +134,11 @@ function Unmask( cBytes, nOpcode )
                      hb_bPeek( cMask, ( ( cChar:__enumIndex() - 1 ) % 4 ) + 1 ) ) ) 
    next   
 
-   do case
-      case Left( cBytes, Len( FILEHEADER ) ) == FILEHEADER
-         cBytes = hb_base64Decode( SubStr( cBytes, Len( FILEHEADER ) + 1 ) )
-         cHeader = FILEHEADER 
-
-      case Left( cBytes, Len( JSONHEADER ) ) == JSONHEADER
-         cBytes = hb_base64Decode( SubStr( cBytes, Len( JSONHEADER ) + 1 ) )
-         cHeader = JSONHEADER
-
-      case Left( cBytes, Len( HTMLHEADER ) ) == HTMLHEADER
-         cBytes = hb_base64Decode( SubStr( cBytes, Len( HTMLHEADER ) + 1 ) )
-         cheader = HTMLHEADER
-   endcase
+   nCommaPos = At( ",", cBytes )
+   cHeader = SubStr( cBytes, 1, nCommaPos - 1 )
+   if Right( cHeader, 6 ) == "base64"
+      cBytes = hb_base64Decode( SubStr( cBytes, nCommaPos + 1 ) )
+   endif  
 
    APPEND BLANK
    if log->( Rlock() )
